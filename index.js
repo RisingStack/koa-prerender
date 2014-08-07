@@ -57,7 +57,7 @@ var extensionsToIgnore = [
   '.torrent'
 ];
 
-var shouldPrerender = function (options) {
+  var shouldPrerender = function (options) {
   var hasExtensionToIgnore = extensionsToIgnore.some(function (extension) {
     return options.url.indexOf(extension) !== -1;
   });
