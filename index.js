@@ -96,7 +96,7 @@ var extensionsToIgnore = [
 module.exports = function (opts) {
 
 
-  return function *prerender(next) {
+  return function *prerender (next) {
     var userAgent = this.get('user-agent');
     var bufferAgent = this.get('x-bufferbot');
     var method = this.method;
@@ -111,7 +111,19 @@ module.exports = function (opts) {
 
     console.log(prerender);
 
-    yield* next;
+
+
+    if (prerender) {
+
+      var create = thunkify(phantom.create);
+      var ph = yield create();
+
+
+      yield* next;
+    } else {
+      yield* next;
+    }
+
 
   };
 
