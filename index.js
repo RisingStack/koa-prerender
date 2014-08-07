@@ -1,6 +1,9 @@
-var phantom = require('phantom');
-var thunkify = require('thunkify');
 var url = require('url');
+
+var request = require('request');
+var thunkify = require('thunkify-wrap');
+
+var requestGet = thunkify(request.get);
 
 var crawlerUserAgents = [
   'baiduspider',
@@ -93,38 +96,37 @@ var extensionsToIgnore = [
   return false;
 };
 
-module.exports = function (opts) {
-
+module.exports = function (option) {
+  option.prerender = option.prerender || 'http://service.prerender.io/';
 
   return function *prerender (next) {
-    var userAgent = this.get('user-agent');
-    var bufferAgent = this.get('x-bufferbot');
-    var method = this.method;
-    var url = this.url;
+    var host = option.host || this.host;
 
-    var prerender = shouldPrerender({
-      userAgent: userAgent,
-      bufferAgent: bufferAgent,
-      method: method,
-      url: url
+    var isPrerender = shouldPrerender({
+      userAgent: this.get('user-agent'),
+      bufferAgent: this.get('x-bufferbot'),
+      method: this.method,
+      url: this.url
     });
 
-    console.log(prerender);
+    var body = '';
 
+    var renderUrl;
+    var preRenderUrl;
+    var response;
 
+    if (isPrerender) {
 
-    if (prerender) {
-
-      var create = thunkify(phantom.create);
-      var ph = yield create();
-
+      renderUrl = this.protocol + '://' + host + this.url;
+      preRenderUrl = option.prerender + renderUrl;
+      response = yield requestGet(preRenderUrl);
+      body = response[1];
 
       yield* next;
+
+      this.body = body.toString();
     } else {
       yield* next;
     }
-
-
   };
-
 };
