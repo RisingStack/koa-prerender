@@ -16,9 +16,9 @@ Install the [Prerender server](https://github.com/prerender/prerender) on a serv
 1. `npm install koa-prerender --save`
 2. Use it as a middleware
 
- ```
+```
 var prerenderOptions = {
   prerender: PRERENDER_SERVER_URL
 };
 app.use(require('koa-prerender')(prerenderOptions));
- ```
+```
