@@ -1,8 +1,15 @@
+/*
+ * @module koa-prerender
+ *
+ * @author Peter Marton, Gergely Nemeth
+ */
+
 var url = require('url');
 
 var request = require('request');
 var thunkify = require('thunkify-wrap');
 
+// Turn callback into a thunk
 var requestGet = thunkify(request.get);
 
 var crawlerUserAgents = [
@@ -60,14 +67,26 @@ var extensionsToIgnore = [
   '.torrent'
 ];
 
-  var shouldPrerender = function (options) {
+var DEFAULT_PRERENDER = 'http://service.prerender.io/';
+
+
+/*
+ * Should pre-render?
+ *
+ * @method shouldPreRender
+ * @param {Object} options
+ * @return {Boolean}
+ */
+function shouldPreRender (options) {
   var hasExtensionToIgnore = extensionsToIgnore.some(function (extension) {
     return options.url.indexOf(extension) !== -1;
   });
+
   var isBot = crawlerUserAgents.some(function (crawlerUserAgent) {
     return options.userAgent.toLowerCase().indexOf(crawlerUserAgent.toLowerCase()) !== -1;
   });
-  // do not prerend when:
+
+  // do not pre-rend when:
   if (!options.userAgent) {
     return false;
   }
@@ -80,8 +99,9 @@ var extensionsToIgnore = [
     return false;
   }
 
-  // do prerender when:
-  if (url.parse(options.url, true).query.hasOwnProperty('_escaped_fragment_')) {
+  // do pre-render when:
+  if (url
+    .parse(options.url, true).query.hasOwnProperty('_escaped_fragment_')) {
     return true;
   }
 
@@ -89,20 +109,39 @@ var extensionsToIgnore = [
     return true;
   }
 
-  if (isBot) {
-    return true;
-  }
+  return isBot;
+}
 
-  return false;
-};
 
-module.exports = function (option) {
-  option.prerender = option.prerender || 'http://service.prerender.io/';
+/*
+ * Pre-render middleware
+ *
+ * @method preRenderMiddleware
+ * @param {Object} options
+ */
+module.exports = function preRenderMiddleware (options) {
+  options.prerender = options.prerender || DEFAULT_PRERENDER;
 
-  return function *prerender (next) {
-    var host = option.host || this.host;
+  /*
+   * Pre-render
+   *
+   * @method preRender
+   * @param {Generator} next
+   */
+  return function *preRender(next) {
+    var protocol = options.protocol || this.protocol;
+    var host = options.host || this.host;
+    var headers = {
+      'User-Agent': this.accept.headers['user-agent']
+    };
 
-    var isPrerender = shouldPrerender({
+    var prePreRenderToken = options.prerenderToken || process.env.PRERENDER_TOKEN;
+
+    if(prePreRenderToken) {
+      headers['X-Prerender-Token'] = prePreRenderToken;
+    }
+
+    var isPreRender = shouldPreRender({
       userAgent: this.get('user-agent'),
       bufferAgent: this.get('x-bufferbot'),
       method: this.method,
@@ -115,17 +154,25 @@ module.exports = function (option) {
     var preRenderUrl;
     var response;
 
-    if (isPrerender) {
+    // Pre-render generate the site and return
+    if (isPreRender) {
+      renderUrl = protocol + '://' + host + this.url;
+      preRenderUrl = options.prerender + renderUrl;
+      response = yield requestGet({
+        url: preRenderUrl,
+        headers: headers,
+        gzip: true
+      });
 
-      renderUrl = this.protocol + '://' + host + this.url;
-      preRenderUrl = option.prerender + renderUrl;
-      response = yield requestGet(preRenderUrl);
-      body = response[1];
+      body = response[1] || '';
 
       yield* next;
 
       this.body = body.toString();
-    } else {
+    }
+
+    // Do nothing
+    else {
       yield* next;
     }
   };
