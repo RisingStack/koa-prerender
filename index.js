@@ -131,6 +131,15 @@ module.exports = function preRenderMiddleware (options) {
   return function *preRender(next) {
     var protocol = options.protocol || this.protocol;
     var host = options.host || this.host;
+    var headers = {
+      'User-Agent': this.accept.headers['user-agent']
+    };
+
+    var prePreRenderToken = options.prerenderToken || process.env.PRERENDER_TOKEN;
+
+    if(prePreRenderToken) {
+      headers['X-Prerender-Token'] = prePreRenderToken;
+    }
 
     var isPreRender = shouldPreRender({
       userAgent: this.get('user-agent'),
@@ -145,17 +154,25 @@ module.exports = function preRenderMiddleware (options) {
     var preRenderUrl;
     var response;
 
+    // Pre-render generate the site and return
     if (isPreRender) {
-
       renderUrl = protocol + '://' + host + this.url;
       preRenderUrl = options.prerender + renderUrl;
-      response = yield requestGet(preRenderUrl);
-      body = response[1];
+      response = yield requestGet({
+        url: preRenderUrl,
+        headers: headers,
+        gzip: true
+      });
+
+      body = response[1] || '';
 
       yield* next;
 
       this.body = body.toString();
-    } else {
+    }
+
+    // Do nothing
+    else {
       yield* next;
     }
   };
