@@ -1,7 +1,7 @@
 /*
  * @module koa-prerender
  *
- * @author RisingStack.com
+ * @author Peter Marton, Gergely Nemeth
  */
 
 var url = require('url');
