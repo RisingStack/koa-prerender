@@ -1,6 +1,8 @@
 koa-prerender
 =====
 
+[![NPM](https://nodei.co/npm/koa-prerender.png)](https://nodei.co/npm/koa-prerender/)
+
 **KOA middleware for prerendering javascript-rendered pages on the fly for SEO**
 
 This middleware intercepts requests to your Node.js website from crawlers, and then makes a call to the (external)
