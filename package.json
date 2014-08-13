@@ -4,12 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test.js --harmony --reporter spec"
   },
   "author": "Gergely Nemeth <mail@nemethgergely.com> (http://twitter.com/nthgergo)",
   "license": "ISC",
   "dependencies": {
     "request": "^2.40.0",
     "thunkify-wrap": "^1.0.2"
+  },
+  "devDependencies": {
+    "koa": "koajs/koa",
+    "chai": "^1.9.1",
+    "mocha": "~1.12.0",
+    "supertest": "~0.7.1"
   }
 }
