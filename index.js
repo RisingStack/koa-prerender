@@ -120,6 +120,7 @@ function shouldPreRender (options) {
  * @param {Object} options
  */
 module.exports = function preRenderMiddleware (options) {
+  options = options || {};
   options.prerender = options.prerender || DEFAULT_PRERENDER;
 
   /*
@@ -169,11 +170,10 @@ module.exports = function preRenderMiddleware (options) {
       yield* next;
 
       this.body = body.toString();
-    }
-
-    // Do nothing
-    else {
+      this.set('X-Prerender', 'true');
+    } else {
       yield* next;
+      this.set('X-Prerender', 'false');
     }
   };
 };
