@@ -1,4 +1,4 @@
-# koa-prerender
+# koa-prerender [![Build Status](https://travis-ci.org/RisingStack/koa-prerender.svg)](https://travis-ci.org/RisingStack/koa-prerender)
 
 [![NPM](https://nodei.co/npm/koa-prerender.png)](https://nodei.co/npm/koa-prerender/)
 
