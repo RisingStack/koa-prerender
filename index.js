@@ -82,10 +82,6 @@ function shouldPreRender (options) {
     return options.url.indexOf(extension) !== -1;
   });
 
-  var isBot = crawlerUserAgents.some(function (crawlerUserAgent) {
-    return options.userAgent.toLowerCase().indexOf(crawlerUserAgent.toLowerCase()) !== -1;
-  });
-
   // do not pre-rend when:
   if (!options.userAgent) {
     return false;
@@ -94,6 +90,10 @@ function shouldPreRender (options) {
   if (options.method !== 'GET') {
     return false;
   }
+
+  var isBot = crawlerUserAgents.some(function (crawlerUserAgent) {
+    return options.userAgent.toLowerCase().indexOf(crawlerUserAgent.toLowerCase()) !== -1;
+  });
 
   if (hasExtensionToIgnore) {
     return false;
