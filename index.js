@@ -167,7 +167,9 @@ module.exports = function preRenderMiddleware (options) {
 
       body = response[1] || '';
 
-      yield* next;
+      if (!options.stopNext) {
+        yield * next;
+      }
 
       this.body = body.toString();
       this.set('X-Prerender', 'true');

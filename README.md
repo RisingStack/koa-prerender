@@ -32,6 +32,7 @@ var options = {
   protocol: 'http',                 // optional, default: this.protocol
   host: 'www.risingstack.com'       // optional, default: this.host,
   prerenderToken: ''                // optional or process.env.PRERENDER_TOKEN
+  stopNext: true                   // optional, if true it will not allow next middleware to continue and instead return the response.
 };
 
 // Use as middleware
