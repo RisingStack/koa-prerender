@@ -173,6 +173,10 @@ module.exports = function preRenderMiddleware (options) {
 
       this.body = body.toString();
       this.set('X-Prerender', 'true');
+
+      if (options.stopNext) {
+        return;
+      }
     } else {
       yield* next;
       this.set('X-Prerender', 'false');
