@@ -149,31 +149,34 @@ module.exports = function preRenderMiddleware (options) {
       url: this.url
     });
 
-    var body = '';
-
     var renderUrl;
     var preRenderUrl;
-    var response;
 
     // Pre-render generate the site and return
     if (isPreRender) {
       renderUrl = protocol + '://' + host + this.url;
       preRenderUrl = options.prerender + renderUrl;
-      response = yield requestGet({
-        url: preRenderUrl,
-        headers: headers,
-        gzip: true
-      });
+      if (options.beforePrerender) {
+        yield options.beforePrerender.call(this);
+      }
 
-      body = response[1] || '';
+      if (! this.body) {
+        var response = yield requestGet({
+          url: preRenderUrl,
+          headers: headers,
+          gzip: true
+        });
+        this.body = (response[1] || '').toString();
+      }
 
-      yield* next;
-
-      this.body = body.toString();
       this.set('X-Prerender', 'true');
+
+      if (options.afterPrerender) {
+        yield options.afterPrerender.call(this);
+      }
     } else {
-      yield* next;
       this.set('X-Prerender', 'false');
+      yield* next;
     }
   };
 };

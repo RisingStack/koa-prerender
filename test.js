@@ -50,4 +50,77 @@ describe('Koa prerender middleware', function() {
 
   });
 
+  describe('when prerenders', function() {
+    describe('calls hooks', function () {
+      it('when beforePrerender is defined', function (done) {
+        var app = koa();
+        app.use(prerender({
+          'beforePrerender': function *() {
+            this.body = 'foo'
+          }
+        }));
+
+        request(app.listen())
+          .get('/?_escaped_fragment_')
+          .expect('X-Prerender', 'true')
+          .expect(200, 'foo', done)
+      });
+
+      it('when afterPrerender is defined', function (done) {
+        var app = koa();
+        app.use(prerender({
+          'afterPrerender': function *() {
+            this.body = 'foo'
+          }
+        }));
+
+        request(app.listen())
+          .get('/?_escaped_fragment_')
+          .expect('X-Prerender', 'true')
+          .expect(200, 'foo', done)
+      })
+    });
+
+    it('does not yield', function (done) {
+      var app = koa();
+      app.use(prerender());
+      app.use(function *() {
+        throw new Error('It yielded.');
+      });
+      request(app.listen())
+        .get('/?_escaped_fragment_')
+        .expect(200, done)
+    });
+  });
+  describe('when does not prerender', function() {
+    it('does not call hooks', function(done) {
+      var app = koa();
+      app.use(prerender({
+        'beforePrerender': function *() {
+          this.body = 'foo'
+        },
+        'afterPrerender': function *() {
+          this.body = 'bar'
+        }
+      }));
+
+      request(app.listen())
+        .get('/')
+        .expect('X-Prerender', 'false')
+        .expect(404, done)
+    });
+
+    it('yields', function(done) {
+      var app = koa();
+      app.use(prerender());
+      app.use(function *() {
+        this.body = 'foo'
+      });
+      request(app.listen())
+        .get('/')
+        .expect('X-Prerender', 'false')
+        .expect(200, 'foo', done)
+    })
+  });
+
 });

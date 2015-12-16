@@ -32,11 +32,31 @@ var options = {
   protocol: 'http',                 // optional, default: this.protocol
   host: 'www.risingstack.com'       // optional, default: this.host,
   prerenderToken: ''                // optional or process.env.PRERENDER_TOKEN
+  beforePrerender: function *() {   // optional before hook
+    this.body = 'foo';
+  },
+  afterPrerender: function *() {    // optional after hook
+    this.body = 'bar';
+  }
 };
 
 // Use as middleware
 app.use(prerender(options));
+
 ```
+> When prerendering happens the request will not yield further down the stack but return the rendered page instead.
+
+
+#### Hooks
+
+If `beforePrerender` or `afterPrerender` is set in the options, they will be called
+before and after the prerendering is supposed to happen. If `beforePrerender` sets a
+body, it will be used and the actual prerender server will **not be called** for that
+request.
+
+This makes it possible to reliably tell when a request was or is going to be prerendered and therefore the perfect place
+to handle caching if needed.
+
 
 ## License
 
