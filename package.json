@@ -1,21 +1,25 @@
 {
-  "name": "koa-prerender",
-  "version": "1.0.3",
-  "description": "",
+  "name": "bot-koa-prerender",
+  "version": "2.0.0",
+  "description": "send bot requests through prerender.io for koajs",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test.js --harmony --reporter spec"
+    "test": "mocha test.js"
   },
-  "author": "Gergely Nemeth <mail@nemethgergely.com> (http://twitter.com/nthgergo)",
-  "license": "ISC",
+  "author": "finbox.io",
+  "license": "MIT",
   "dependencies": {
-    "request": "^2.40.0",
-    "thunkify-wrap": "^1.0.2"
+    "axios": "0.9.1",
+    "is-bot": "0.0.1"
   },
   "devDependencies": {
     "chai": "^1.9.1",
     "koa": "koajs/koa",
     "mocha": "~1.12.0",
     "supertest": "^0.13.0"
+  },
+  "engines": {
+    "node": "4.2.1",
+    "npm": "2.14.5"
   }
 }

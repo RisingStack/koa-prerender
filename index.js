@@ -2,31 +2,14 @@
  * @module koa-prerender
  *
  * @author Peter Marton, Gergely Nemeth
+ * @fork finbox.io
  */
 
-var url = require('url');
+var url = require('url')
+var axios = require('axios')
+var is_bot = require('is-bot')
 
-var request = require('request');
-var thunkify = require('thunkify-wrap');
-
-// Turn callback into a thunk
-var requestGet = thunkify(request.get);
-
-var crawlerUserAgents = [
-  'baiduspider',
-  'facebookexternalhit',
-  'twitterbot',
-  'rogerbot',
-  'linkedinbot',
-  'embedly',
-  'quora link preview',
-  'showyoubot',
-  'outbrain',
-  'pinterest',
-  'developers.google.com/+/web/snippet'
-];
-
-var extensionsToIgnore = [
+var extensions_to_ignore = [
   '.js',
   '.css',
   '.xml',
@@ -65,115 +48,85 @@ var extensionsToIgnore = [
   '.flv',
   '.m4v',
   '.torrent'
-];
+]
 
-var DEFAULT_PRERENDER = 'http://service.prerender.io/';
-
+var DEFAULT_PRERENDER = 'http://service.prerender.io/'
 
 /*
  * Should pre-render?
  *
- * @method shouldPreRender
+ * @method should_pre_render
  * @param {Object} options
  * @return {Boolean}
  */
-function shouldPreRender (options) {
-  var hasExtensionToIgnore = extensionsToIgnore.some(function (extension) {
-    return options.url.indexOf(extension) !== -1;
-  });
 
-  var isBot = crawlerUserAgents.some(function (crawlerUserAgent) {
-    return options.userAgent.toLowerCase().indexOf(crawlerUserAgent.toLowerCase()) !== -1;
-  });
+function should_pre_render (options) {
+  var has_extension_to_ignore = extensions_to_ignore
+    .some(extension => ~options.url.indexOf(extension))
 
   // do not pre-rend when:
-  if (!options.userAgent) {
-    return false;
-  }
-
-  if (options.method !== 'GET') {
-    return false;
-  }
-
-  if (hasExtensionToIgnore) {
-    return false;
-  }
+  if (!options.userAgent) return false
+  if (options.method !== 'GET') return false
+  if (has_extension_to_ignore) return false
 
   // do pre-render when:
-  var query = url.parse(options.url, true).query;
-  if (query && query.hasOwnProperty('_escaped_fragment_')) {
-    return true;
-  }
-
-  if (options.bufferAgent) {
-    return true;
-  }
-
-  return isBot;
+  var query = url.parse(options.url, true).query
+  if (query && query.hasOwnProperty('_escaped_fragment_')) return true
+  if (options.bufferAgent) return true
+  return is_bot(options.userAgent)
 }
 
 
 /*
  * Pre-render middleware
  *
- * @method preRenderMiddleware
+ * @method pre_render_middleware
  * @param {Object} options
  */
-module.exports = function preRenderMiddleware (options) {
-  options = options || {};
-  options.prerender = options.prerender || DEFAULT_PRERENDER;
+module.exports = function pre_render_middleware (options) {
+  options = options || {}
+  options.prerender = options.prerender || DEFAULT_PRERENDER
 
   /*
    * Pre-render
    *
-   * @method preRender
+   * @method pre_render
    * @param {Generator} next
    */
-  return function *preRender(next) {
-    var protocol = options.protocol || this.protocol;
-    var host = options.host || this.host;
-    var headers = {
-      'User-Agent': this.accept.headers['user-agent']
-    };
+  return function * pre_render(next) {
+    var protocol = options.protocol || this.protocol
+    var host = options.host || this.host
+    var headers = { 'User-Agent': this.accept.headers['user-agent'] }
 
-    var prePreRenderToken = options.prerenderToken || process.env.PRERENDER_TOKEN;
+    var token = options.prerender_token || process.env.PRERENDER_TOKEN
 
-    if(prePreRenderToken) {
-      headers['X-Prerender-Token'] = prePreRenderToken;
-    }
+    if (token) headers['X-Prerender-Token'] = token
 
-    var isPreRender = shouldPreRender({
+    var yes_pre_render = should_pre_render({
       userAgent: this.get('user-agent'),
       bufferAgent: this.get('x-bufferbot'),
       method: this.method,
       url: this.url
-    });
-
-    var body = '';
-
-    var renderUrl;
-    var preRenderUrl;
-    var response;
+    })
 
     // Pre-render generate the site and return
-    if (isPreRender) {
-      renderUrl = protocol + '://' + host + this.url;
-      preRenderUrl = options.prerender + renderUrl;
-      response = yield requestGet({
-        url: preRenderUrl,
-        headers: headers,
-        gzip: true
-      });
+    if (yes_pre_render) {
+      var render_url = protocol + '://' + host + this.url
+      var pre_render_url = options.prerender + render_url
+      var response = yield axios({
+        url: pre_render_url,
+        headers: headers
+      }).catch(() => { return { data: '' } })
 
-      body = response[1] || '';
+      var body = response.data
 
-      yield* next;
+      yield* next
 
-      this.body = body.toString();
-      this.set('X-Prerender', 'true');
+      this.body = body
+      this.set('X-Prerender', 'true')
     } else {
-      yield* next;
-      this.set('X-Prerender', 'false');
+      yield* next
+      this.set('X-Prerender', 'false')
     }
-  };
-};
+  }
+}
