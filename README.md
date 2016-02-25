@@ -2,11 +2,6 @@
 
 [![NPM](https://nodei.co/npm/bot-koa-prerender.png)](https://nodei.co/npm/bot-koa-prerender/)
 
-**THIS FORK HAS ONE MAIN DIFFERENCES FROM THE ORIGINAL**
-
-- It uses the specified prerender for all bot requests
-
-
 **KOA middleware for prerendering javascript-rendered pages on the fly for SEO**
 
 This [koa](https://koajs.com) middleware intercepts requests to your Node.js website from bots, and then makes a call to the (external)

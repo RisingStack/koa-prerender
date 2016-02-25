@@ -7,21 +7,12 @@
 
 var url = require('url')
 var axios = require('axios')
-var is_bot = require('is-bot')
 
 var extensions_to_ignore = [
-  '.js',
-  '.css',
-  '.xml',
   '.less',
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.gif',
   '.pdf',
   '.doc',
   '.txt',
-  '.ico',
   '.rss',
   '.zip',
   '.mp3',
@@ -50,6 +41,30 @@ var extensions_to_ignore = [
   '.torrent'
 ]
 
+var crawlers = [
+  'googlebot',
+  'yahoo',
+  'bingbot',
+  'baiduspider',
+  'facebookexternalhit',
+  'twitterbot',
+  'rogerbot',
+  'linkedinbot',
+  'embedly',
+  'quora link preview',
+  'showyoubot',
+  'outbrain',
+  'pinterest',
+  'developers.google.com/+/web/snippet',
+  'slackbot',
+  'vkShare',
+  'W3C_Validator',
+  'redditbot',
+  'Applebot',
+  'WhatsApp',
+  'flipboard'
+]
+
 var DEFAULT_PRERENDER = 'http://service.prerender.io/'
 
 /*
@@ -75,7 +90,6 @@ function should_pre_render (options) {
   if (options.bufferAgent) return true
   return is_bot(options.userAgent)
 }
-
 
 /*
  * Pre-render middleware
@@ -129,4 +143,10 @@ module.exports = function pre_render_middleware (options) {
       this.set('X-Prerender', 'false')
     }
   }
+}
+
+function is_bot (user_agent) {
+  return crawlers.some((crawler) => {
+    return ~user_agent.toLowerCase().indexOf(crawler.toLowerCase())
+  })
 }
