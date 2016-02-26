@@ -7,6 +7,7 @@
 
 var url = require('url')
 var axios = require('axios')
+var is_bot = require('is-bot')
 
 var extensions_to_ignore = [
   '.js',
@@ -155,10 +156,4 @@ module.exports = function pre_render_middleware (options) {
       this.set('X-Prerender', 'false')
     }
   }
-}
-
-function is_bot (user_agent) {
-  return crawlers.some((crawler) => {
-    return ~user_agent.toLowerCase().indexOf(crawler)
-  })
 }
