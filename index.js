@@ -51,26 +51,25 @@ var extensions_to_ignore = [
 ]
 
 var crawlers = [
-  'googlebot',
+  'google',
   'yahoo',
-  'bingbot',
-  'baiduspider',
-  'facebookexternalhit',
+  'bing',
+  'baidu',
+  'facebook',
   'twitterbot',
-  'rogerbot',
-  'linkedinbot',
+  'roger',
+  'linkedin',
   'embedly',
-  'quora link preview',
-  'showyoubot',
+  'quora',
+  'showyou',
   'outbrain',
   'pinterest',
-  'developers.google.com/+/web/snippet',
-  'slackbot',
-  'vkShare',
-  'W3C_Validator',
-  'redditbot',
-  'Applebot',
-  'WhatsApp',
+  'slack',
+  'vkshare',
+  'w3c_validator',
+  'reddit',
+  'apple',
+  'whatsapp',
   'flipboard'
 ]
 
@@ -162,6 +161,6 @@ module.exports = function pre_render_middleware (options) {
 
 function is_bot (user_agent) {
   return crawlers.some((crawler) => {
-    return ~user_agent.toLowerCase().indexOf(crawler.toLowerCase())
+    return ~user_agent.toLowerCase().indexOf(crawler)
   })
 }
