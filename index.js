@@ -52,25 +52,26 @@ var extensions_to_ignore = [
 ]
 
 var crawlers = [
-  'google',
+  'googlebot',
   'yahoo',
-  'bing',
-  'baidu',
-  'facebook',
+  'bingbot',
+  'baiduspider',
+  'facebookexternalhit',
   'twitterbot',
-  'roger',
-  'linkedin',
+  'rogerbot',
+  'linkedinbot',
   'embedly',
-  'quora',
-  'showyou',
+  'quora link preview',
+  'showyoubot',
   'outbrain',
   'pinterest',
-  'slack',
-  'vkshare',
-  'w3c_validator',
-  'reddit',
-  'apple',
-  'whatsapp',
+  'developers.google.com/+/web/snippet',
+  'slackbot',
+  'vkShare',
+  'W3C_Validator',
+  'redditbot',
+  'Applebot',
+  'WhatsApp',
   'flipboard'
 ]
 
@@ -136,15 +137,18 @@ module.exports = function pre_render_middleware (options) {
     // Pre-render generate the site and return
     if (yes_pre_render) {
 
-      var render_url = protocol + '://' + host + this.url
+      var render_url = this.href
       var pre_render_url = options.prerender + render_url
       var response = yield axios({
         url: pre_render_url,
         headers: headers
-      }).catch(() => { return { data: '' } })
+      }).catch((e) => {
+        console.error(e)
+        return { data: '' }
+      })
 
       var body = response.data
-
+      if (!body) console.error('No response received :(')
       if (options.log) console.log('pre-render...%s, %s', render_url, JSON.stringify(headers))
 
       yield* next
@@ -156,4 +160,10 @@ module.exports = function pre_render_middleware (options) {
       this.set('X-Prerender', 'false')
     }
   }
+}
+
+function is_bot (user_agent) {
+  return crawlers.some((crawler) => {
+    return ~user_agent.toLowerCase().indexOf(crawler)
+  })
 }
