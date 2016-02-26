@@ -88,6 +88,7 @@ function should_pre_render (options) {
   var query = url.parse(options.url, true).query
   if (query && query.hasOwnProperty('_escaped_fragment_')) return true
   if (options.bufferAgent) return true
+
   return is_bot(options.userAgent)
 }
 
@@ -125,7 +126,9 @@ module.exports = function pre_render_middleware (options) {
 
     // Pre-render generate the site and return
     if (yes_pre_render) {
-      var render_url = protocol + '://' + host + this.url
+      if (options.log) console.log('pre-rendering...')
+
+      var render_url = this.href
       var pre_render_url = options.prerender + render_url
       var response = yield axios({
         url: pre_render_url,
@@ -139,6 +142,8 @@ module.exports = function pre_render_middleware (options) {
       this.body = body
       this.set('X-Prerender', 'true')
     } else {
+      if (options.log) console.log('don\'t pre-rendering...')
+
       yield* next
       this.set('X-Prerender', 'false')
     }
