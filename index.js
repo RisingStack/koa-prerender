@@ -136,8 +136,7 @@ module.exports = function pre_render_middleware (options) {
 
     // Pre-render generate the site and return
     if (yes_pre_render) {
-
-      var render_url = this.href
+      var render_url = protocol + '://' + host + this.url
       var pre_render_url = options.prerender + render_url
       var response = yield axios({
         url: pre_render_url,
