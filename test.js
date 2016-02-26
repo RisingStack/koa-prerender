@@ -30,7 +30,7 @@ describe('Koa prerender middleware', function() {
 
       request(app.listen())
         .get('/')
-        .set('user-agent', 'twitterbot')
+        .set('user-agent', 'slackbot')
         .expect('X-Prerender', 'true')
         .expect(200, done)
     })

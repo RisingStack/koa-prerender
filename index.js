@@ -9,10 +9,19 @@ var url = require('url')
 var axios = require('axios')
 
 var extensions_to_ignore = [
+  '.js',
+  '.jsx',
+  '.css',
+  '.xml',
   '.less',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
   '.pdf',
   '.doc',
   '.txt',
+  '.ico',
   '.rss',
   '.zip',
   '.mp3',
@@ -126,9 +135,8 @@ module.exports = function pre_render_middleware (options) {
 
     // Pre-render generate the site and return
     if (yes_pre_render) {
-      if (options.log) console.log('pre-rendering...')
 
-      var render_url = this.href
+      var render_url = protocol + '://' + host + this.url
       var pre_render_url = options.prerender + render_url
       var response = yield axios({
         url: pre_render_url,
@@ -137,12 +145,14 @@ module.exports = function pre_render_middleware (options) {
 
       var body = response.data
 
+      if (options.log) console.log('pre-render...%s, %s', render_url, headers)
+
       yield* next
 
       this.body = body
       this.set('X-Prerender', 'true')
     } else {
-      if (options.log) console.log('don\'t pre-rendering...')
+      if (options.log) console.log('don\'t pre-render...%s, %s', render_url, headers)
 
       yield* next
       this.set('X-Prerender', 'false')
