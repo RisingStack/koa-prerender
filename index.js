@@ -144,15 +144,13 @@ module.exports = function pre_render_middleware (options) {
 
       var body = response.data
 
-      if (options.log) console.log('pre-render...%s, %s', render_url, headers)
+      if (options.log) console.log('pre-render...%s, %s', render_url, JSON.stringify(headers))
 
       yield* next
 
       this.body = body
       this.set('X-Prerender', 'true')
     } else {
-      if (options.log) console.log('don\'t pre-render...%s, %s', render_url, headers)
-
       yield* next
       this.set('X-Prerender', 'false')
     }
