@@ -96,7 +96,7 @@ function should_pre_render (options) {
 
   // do pre-render when:
   var query = url.parse(options.url, true).query
-  if (query && query.hasOwnProperty('_escaped_fragment_')) return true
+  if (query && query['_escaped_fragment_'] !== undefined) return true
   if (options.bufferAgent) return true
 
   return is_bot(options.userAgent)
