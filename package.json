@@ -9,8 +9,7 @@
   "author": "finbox.io",
   "license": "MIT",
   "dependencies": {
-    "axios": "0.9.1",
-    "is-bot": "0.0.1"
+    "axios": "0.9.1"
   },
   "devDependencies": {
     "chai": "^1.9.1",
