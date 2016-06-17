@@ -1,4 +1,14 @@
 
+4.0.0 / 2016-06-17
+==================
+
+  * upgrade dependencies
+  * Merge pull request #2 from teohhanhui/patch-2
+  * Merge pull request #1 from teohhanhui/patch-1
+  * Remove unused "is-bot" from dependencies
+  * Remove require('is-bot')
+  * Don't use Object.prototpye.hasOwnProperty on query
+
 3.0.6 / 2016-02-26
 ==================
 
