@@ -32,7 +32,13 @@ describe('Koa prerender middleware', function() {
         .get('/')
         .set('user-agent', 'slackbot')
         .expect('X-Prerender', 'true')
-        .expect(200, done)
+        .expect(200, () => {
+          request(app.listen())
+            .get('/')
+            .set('user-agent', 'YandexBot')
+            .expect('X-Prerender', 'true')
+            .expect(200, done)
+        })
     })
 
     it('x-bufferbot is set in options', function (done) {

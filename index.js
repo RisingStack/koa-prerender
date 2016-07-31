@@ -51,6 +51,7 @@ var extensions_to_ignore = [
 ]
 
 var crawlers = [
+  'yandexbot',
   'googlebot',
   'yahoo',
   'bingbot',
