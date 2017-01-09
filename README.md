@@ -18,7 +18,7 @@ Install [Prerender](https://github.com/prerender/prerender) on a server of your 
 Install the [package](https://npmjs.org/package/koa-prerender) with [npm](https://npmjs.org):
 
 ```sh
-$ npm install koa-prerender`
+$ npm install koa-prerender
 ```
 
 ### Usage
