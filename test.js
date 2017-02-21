@@ -11,49 +11,54 @@ describe('Koa prerender middleware', function() {
   })
 
   describe('prerenders when', function() {
-
     it('url contains _escaped_fragment_', function (done) {
       var app = koa()
-
       app.use(prerender())
 
-      request(app.listen())
+      var server = app.listen()
+      request(server)
         .get('/?_escaped_fragment_')
         .expect('X-Prerender', 'true')
-        .expect(200, done)
+        .expect(200, function () {
+          server.close()
+          done()
+        })
     })
 
     it('user-agent looks like a bot', function (done) {
       var app = koa()
-
       app.use(prerender())
 
-      request(app.listen())
+      var server = app.listen()
+      request(server)
         .get('/')
         .set('user-agent', 'slackbot')
         .expect('X-Prerender', 'true')
-        .expect(200, () => {
-          request(app.listen())
+        .expect(200, function () {
+          request(server)
             .get('/')
             .set('user-agent', 'YandexBot')
             .expect('X-Prerender', 'true')
-            .expect(200, done)
+            .expect(200, function () {
+              server.close()
+              done()
+            })
         })
     })
 
     it('x-bufferbot is set in options', function (done) {
       var app = koa()
-
       app.use(prerender())
 
-      request(app.listen())
+      var server = app.listen()
+      request(server)
         .get('/')
         .set('x-bufferbot', 'whatever')
         .expect('X-Prerender', 'true')
-        .expect(200, done)
-
+        .expect(200, function () {
+          server.close()
+          done()
+        })
     })
-
   })
-
 })
