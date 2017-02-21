@@ -93,11 +93,14 @@ var DEFAULT_PRERENDER = 'http://service.prerender.io/'
 
 function should_pre_render (options) {
   var has_extension_to_ignore = extensions_to_ignore
-    .some(extension => ~options.url.indexOf(extension))
+    .some(function (extension) {
+      return ~options.url.indexOf(extension)
+    })
 
   // do not pre-rend when:
   if (!options.userAgent) return false
   if (options.method !== 'GET') return false
+  if (options.prerenderAgent) return false
   if (has_extension_to_ignore) return false
 
   // do pre-render when:
@@ -149,7 +152,7 @@ module.exports = function pre_render_middleware (options) {
       var response = yield axios({
         url: pre_render_url,
         headers: headers
-      }).catch((e) => {
+      }).catch(function (e) {
         if (debug) console.error(e.message)
         return { data: '' }
       })
@@ -170,7 +173,12 @@ module.exports = function pre_render_middleware (options) {
 }
 
 function is_bot (user_agent) {
-  return crawlers.some((crawler) => {
-    return ~user_agent.toLowerCase().indexOf(crawler)
-  })
+  return crawlers.some(check_ua(user_agent))
+}
+
+function check_ua (user_agent) {
+  return function (crawler) {
+    return ~user_agent.toLowerCase()
+      .indexOf(crawler)
+  }
 }
