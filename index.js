@@ -127,6 +127,7 @@ module.exports = function pre_render_middleware (options) {
   return function * pre_render(next) {
     var protocol = options.protocol || this.protocol
     var host = options.host || this.host
+    var ua_passthrough = options.user_agent_passthrough
     var headers = { 'User-Agent': this.accept.headers['user-agent'] }
 
     var token = options.prerender_token || process.env.PRERENDER_TOKEN
@@ -136,6 +137,7 @@ module.exports = function pre_render_middleware (options) {
     var yes_pre_render = should_pre_render({
       userAgent: this.get('user-agent'),
       bufferAgent: this.get('x-bufferbot'),
+      prerenderAgent: ua_passthrough && this.get('x-prerender'),
       method: this.method,
       url: this.url
     })
