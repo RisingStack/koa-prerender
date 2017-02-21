@@ -72,7 +72,12 @@ var crawlers = [
   'redditbot',
   'Applebot',
   'WhatsApp',
-  'flipboard'
+  'flipboard',
+  'duckduckbot',
+  'sogou',
+  'exabot',
+  'ia_archiver',
+  'facebot'
 ]
 
 var DEFAULT_PRERENDER = 'http://service.prerender.io/'
