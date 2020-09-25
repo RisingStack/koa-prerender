@@ -101,7 +101,7 @@ function shouldPreRender (options) {
 
   // do pre-render when:
   var query = url.parse(options.url, true).query;
-  if (query && query.hasOwnProperty('_escaped_fragment_')) {
+  if (query && query['_escaped_fragment_'] !== undefined) {
     return true;
   }
 
