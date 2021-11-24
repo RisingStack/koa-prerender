@@ -23,7 +23,26 @@ var crawlerUserAgents = [
   'showyoubot',
   'outbrain',
   'pinterest',
-  'developers.google.com/+/web/snippet'
+  'developers.google.com/+/web/snippet',
+  'slackbot',
+  'vkShare',
+  'W3C_Validator',
+  'redditbot',
+  'Applebot',
+  'WhatsApp',
+  'flipboard',
+  'tumblr',
+  'bitlybot',
+  'SkypeUriPreview',
+  'nuzzel',
+  'Discordbot',
+  'Google Page Speed',
+  'Qwantify',
+  'pinterestbot',
+  'Bitrix link preview',
+  'XING-contenttabreceiver',
+  'Chrome-Lighthouse',
+  'TelegramBot'
 ];
 
 var extensionsToIgnore = [
